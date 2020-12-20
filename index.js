@@ -100,7 +100,7 @@ app.post("/api", function (req, res) {
 
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response));
+        // console.log(JSON.stringify(response));
         var name = response.data.name;
         var profile_pic_url = response.data.profile_pic_url;
         var thumbnailUrl = response.data.thumbnailUrl;
@@ -112,7 +112,7 @@ app.post("/api", function (req, res) {
 
         var object1 = {
           title: name,
-          source: "tiktok",
+          source: "mxtaktak",
           thumbnail: thumbnailUrl,
           duration: "00:15",
           message: status,
@@ -243,24 +243,28 @@ app.post("/api", function (req, res) {
                 var titleis = obj.title;
                 var thumb = obj.thumbnail_url;
 
-                var object1 = {
-                  title: titleis,
-                  source: "soundcloud",
-                  thumbnail: thumb,
-                  duration: "00:15",
-                  message: "true",
-                  links: [
-                    {
-                      url: objjsonsound["url"],
-                      type: "mp3",
-                      size: "3.86 MB",
-                      quality: "hd",
-                      mute: "no",
-                    },
-                  ],
-                };
-                res.status(200).json(object1);
-                //console.log(object1);
+                var remote = require("remote-file-size");
+                var url = objjsonsound["url"];
+                remote(url, function (err, o) {
+                  var object1 = {
+                    title: titleis,
+                    source: "soundcloud",
+                    thumbnail: thumb,
+                    duration: "00:15",
+                    message: "true",
+                    links: [
+                      {
+                        url: objjsonsound["url"],
+                        type: "mp3",
+                        size: (o * 0.000001).toString() + " MB",
+                        quality: "hd",
+                        mute: "no",
+                      },
+                    ],
+                  };
+                  res.status(200).json(object1);
+                  //console.log(object1);                })
+                });
               });
               console.log(newurl);
             }
@@ -273,16 +277,10 @@ app.post("/api", function (req, res) {
   } else if (url.includes("bandcam")) {
     // bandcam https://mikehuguenor.bandcamp.com/album/xed
 
-    {
-      /* <meta property="og:video" content="https://bandcamp.com/EmbeddedPlayer/v=2/album=3989959961/size=large/tracklist=false/artwork=small/"></meta> */
-    }
-
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
       var title = get_string_between(body, "<title>", "</title>");
-      //   var embed_url = get_string_between(body,  '<meta property=\"og:video\" content=\"', '\"><');
-      //  var embed_url = get_string_between(body,  'og:video', '>meta');
 
       const jsdom = require("jsdom");
       const { JSDOM } = jsdom;
@@ -307,6 +305,8 @@ app.post("/api", function (req, res) {
         );
         var objjsonsound = JSON.parse(part);
 
+        // console.log(objjsonsound)
+
         var linkdsdata = [];
         var object134 = {
           title: title,
@@ -323,7 +323,7 @@ app.post("/api", function (req, res) {
           var mylinksdat = {
             url: objjsonsound["tracks"][i]["file"]["mp3-128"],
             size: "2.67 MB",
-            quality: "hd",
+            quality: objjsonsound["tracks"][i]["title"] + " (hd)",
             mute: "false",
             type: "mp3",
           };
@@ -334,6 +334,166 @@ app.post("/api", function (req, res) {
         res.status(200).json(object134);
       });
     });
+  } else if (url.includes("bitchute")) {
+    //bitchute  https://www.bitchute.com/video/8xYXZiCaRHQg/
+
+    var request = require("request");
+
+    request({ uri: url }, function (error, response, body) {
+      var title = get_string_between(body, "<title>", "</title>");
+
+      // console.log(duration);
+
+      const jsdom = require("jsdom");
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(body);
+
+      var thumbnailp = dom.window.document.querySelector('video[id="player"]')
+        .poster;
+      console.log(thumbnailp);
+
+      var videourl = dom.window.document.querySelector("source").src;
+      console.log(videourl);
+
+      var duration = dom.window.document.querySelector(
+        'span[class="video-duration"]'
+      ).textContent;
+      console.log(duration);
+
+      var remote = require("remote-file-size");
+      remote(videourl, function (err, o) {
+        var s = Math.round(o * 0.000001);
+
+        var object1 = {
+          title: title,
+          source: "bitchute",
+          thumbnail: thumbnailp,
+          duration: duration,
+          message: "true",
+          links: [
+            {
+              url: videourl,
+              size: s.toString() + " MB",
+              quality: "720p",
+              type: "mp4",
+              mute: "no",
+            },
+          ],
+        };
+
+        res.status(200).json(object1);
+      });
+    });
+  }  else if (url.includes("izlesene")) {
+    //bitchute  https://www.bitchute.com/video/8xYXZiCaRHQg/
+
+    var request = require("request");
+
+    request({ uri: url }, function (error, response, body) {
+      var title = get_string_between(body, "<title>", "</title>");
+
+      // console.log(duration);
+
+      const jsdom = require("jsdom");
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(body);
+
+      var thumbnailp = dom.window.document.querySelector('video[id="player"]')
+        .poster;
+      console.log(thumbnailp);
+
+      var videourl = dom.window.document.querySelector("source").src;
+      console.log(videourl);
+
+      var duration = dom.window.document.querySelector(
+        'span[class="video-duration"]'
+      ).textContent;
+      console.log(duration);
+
+      var remote = require("remote-file-size");
+      remote(videourl, function (err, o) {
+        var s = Math.round(o * 0.000001);
+
+        var object1 = {
+          title: title,
+          source: "bitchute",
+          thumbnail: thumbnailp,
+          duration: duration,
+          message: "true",
+          links: [
+            {
+              url: videourl,
+              size: s.toString() + " MB",
+              quality: "720p",
+              type: "mp4",
+              mute: "no",
+            },
+          ],
+        };
+
+        res.status(200).json(object1);
+      });
+    });
+  } 
+  else if (url.includes("douyin")) {
+    //douyin  https://www.iesdouyin.com/share/video/6878314461388639501
+
+    var axios = require("axios");
+
+    var vidid = url.substring(url.lastIndexOf("/") + 1);
+    // console.log(vidid);
+
+    var newurlis =
+      "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + vidid;
+
+    var config = {
+      method: "get",
+      url: newurlis,
+      headers: {},
+    };
+
+    axios(config)
+      .then(function (response) {
+        var myjsondata = response.data;
+
+        var vidoo =
+          response.data["item_list"][0]["video"]["play_addr"]["url_list"][0];
+        console.log(vidoo);
+
+        var object1 = {
+          title: myjsondata["item_list"][0]["desc"],
+          source: "douyin",
+          thumbnail:
+            myjsondata["item_list"][0]["video"]["cover"]["url_list"][0],
+          duration:
+            myjsondata["item_list"][0]["video"]["duration"] / 1000 + "sec",
+          message: "true",
+          links: [
+            {
+              url:
+                myjsondata["item_list"][0]["video"]["play_addr"]["url_list"][0],
+              size: "9.4 MB",
+              quality: "720p",
+              type: "mp4",
+
+              mute: "no",
+            },
+            {
+              url: myjsondata["item_list"][0]["music"]["play_url"]["uri"],
+              size: "1.4 MB",
+              quality: "128kbps",
+              type: "mp3",
+
+              mute: "no",
+            },
+          ],
+        };
+
+        res.status(200).json(object1);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   } else {
     console.log("Error");
     res.status(404).json({ message: "URL NOT FOUND", status: "404" });
@@ -347,24 +507,18 @@ app.listen(port, () => {
 function formet_size(bytes) {
   switch (bytes) {
     case bytes < 1024:
-      var size = bytes + "B";
-      break;
+      var size = bytes;
+
+      return size.toString() + "B";
 
     case bytes < 1048576:
-      var size = round(bytes / 1024, 2) + "KB";
-      break;
-    case bytes < 1073741824:
-      var size = round(bytes / 1048576, 2) + "MB";
-      break;
-    case bytes < 1099511627776:
-      var size = round(bytes / 1073741824, 2) + "GB";
-      break;
-  }
+      return Math.round(bytes / 1024) + "KB";
 
-  if (!empty(size)) {
-    return size;
-  } else {
-    return "";
+    case bytes < 1073741824:
+      return Math.round(bytes / 1048576).toString() + "MB";
+
+    case bytes < 1099511627776:
+      return Math.round(bytes / 1073741824) + "GB";
   }
 }
 
