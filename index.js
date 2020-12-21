@@ -453,7 +453,7 @@ app.post("/api", function (req, res) {
 
 
   } else if (url.includes("linkedin")) {
-    //bitchute  https://www.izlesene.com/video/ehliyetsiz-surucuden-pes-dedirten-savunma-sadece-gece-biniyorum/10519222
+    //linkdin  https://www.linkedin.com/posts/ajjames_wow-this-guy-has-skills-what-could-go-wrong-ugcPost-6746360912342462464-5Nf6
 
     // window._videoObj = {
     
@@ -463,58 +463,51 @@ app.post("/api", function (req, res) {
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
-      var title = "{"+get_string_between(body, "window._videoObj = {", "}};")+"}}";
+      var mydatais = "[{"+get_string_between(body, "data-sources=\"[{", "}]\"")+"}]";
+    //  var poster = get_string_between(body, "data-poster-url=", "data");
 
-       var objjsonsound = JSON.parse(title);
-       console.log(objjsonsound["media"]["level"].length);
-       console.log(objjsonsound["media"]["level"][0]["source"]);
 
-      
-  
-        var linkdsdata = [];
+      const Entities = require('html-entities').AllHtmlEntities;
 
-        var object1 = {
-          title: objjsonsound["videoTitle"],
-          source: "izlesene",
-          thumbnail: objjsonsound["posterURL"],
-          duration: (objjsonsound["duration"]/ 1000)+"sec" ,
-          message: "true",
-          links: linkdsdata,
+      const entities = new Entities();
+
+      var objjsonsound = JSON.parse(entities.decode(mydatais));
+
+
+
+      var title = get_string_between(body, "<title>", "</title>");
+
+      console.log(objjsonsound[0]["src"])
+      var linkdsdata = [];
+
+      var object1 = {
+        title: title,
+        source: "linkdin",
+        thumbnail: "https://www.researchsnipers.com/wp-content/uploads/2018/06/linkedinlogo.png",
+        duration: "NaN sec" ,
+        message: "true",
+        links: linkdsdata,
+      };
+
+
+
+      for (var i = 0; i < objjsonsound.length - 1; i++) {
+        // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
+
+        var mylinksdat = {
+          url: objjsonsound[i]["src"],
+          size: "NaN MB",
+          quality:"HD",
+          mute: "false",
+          type: "mp4",
         };
 
-
-        if(objjsonsound["media"]["level"].length == 1){
-
-          var mylinksdat = {
-            url: objjsonsound["media"]["level"][0]["source"],
-            size: "NaN MB",
-            quality: objjsonsound["media"]["level"][0]["value"],
-            mute: "false",
-            type: "mp4",
-          };
-
-          linkdsdata.push(mylinksdat);
-
-
-        }else{
-
-        for (var i = 0; i < objjsonsound["media"]["level"].length - 1; i++) {
-          // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
-
-          var mylinksdat = {
-            url: objjsonsound["media"]["level"][i]["source"],
-            size: "NaN MB",
-            quality: objjsonsound["media"]["level"][i]["value"],
-            mute: "false",
-            type: "mp4",
-          };
-
-          linkdsdata.push(mylinksdat);
-        }
-
+        linkdsdata.push(mylinksdat);
       }
 
-      res.status(200).json(object1);
+ 
+
+   res.status(200).json(object1);
 
 
     });
