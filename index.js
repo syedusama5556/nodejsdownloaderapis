@@ -385,55 +385,141 @@ app.post("/api", function (req, res) {
       });
     });
   }  else if (url.includes("izlesene")) {
-    //bitchute  https://www.bitchute.com/video/8xYXZiCaRHQg/
+    //bitchute  https://www.izlesene.com/video/ehliyetsiz-surucuden-pes-dedirten-savunma-sadece-gece-biniyorum/10519222
+
+    // window._videoObj = {
+    
+    // }};
+
 
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
-      var title = get_string_between(body, "<title>", "</title>");
+      var title = "{"+get_string_between(body, "window._videoObj = {", "}};")+"}}";
 
-      // console.log(duration);
+       var objjsonsound = JSON.parse(title);
+       console.log(objjsonsound["media"]["level"].length);
+       console.log(objjsonsound["media"]["level"][0]["source"]);
 
-      const jsdom = require("jsdom");
-      const { JSDOM } = jsdom;
-      const dom = new JSDOM(body);
-
-      var thumbnailp = dom.window.document.querySelector('video[id="player"]')
-        .poster;
-      console.log(thumbnailp);
-
-      var videourl = dom.window.document.querySelector("source").src;
-      console.log(videourl);
-
-      var duration = dom.window.document.querySelector(
-        'span[class="video-duration"]'
-      ).textContent;
-      console.log(duration);
-
-      var remote = require("remote-file-size");
-      remote(videourl, function (err, o) {
-        var s = Math.round(o * 0.000001);
+      
+  
+        var linkdsdata = [];
 
         var object1 = {
-          title: title,
-          source: "bitchute",
-          thumbnail: thumbnailp,
-          duration: duration,
+          title: objjsonsound["videoTitle"],
+          source: "izlesene",
+          thumbnail: objjsonsound["posterURL"],
+          duration: (objjsonsound["duration"]/ 1000)+"sec" ,
           message: "true",
-          links: [
-            {
-              url: videourl,
-              size: s.toString() + " MB",
-              quality: "720p",
-              type: "mp4",
-              mute: "no",
-            },
-          ],
+          links: linkdsdata,
         };
 
-        res.status(200).json(object1);
-      });
+
+        if(objjsonsound["media"]["level"].length == 1){
+
+          var mylinksdat = {
+            url: objjsonsound["media"]["level"][0]["source"],
+            size: "NaN MB",
+            quality: objjsonsound["media"]["level"][0]["value"],
+            mute: "false",
+            type: "mp4",
+          };
+
+          linkdsdata.push(mylinksdat);
+
+
+        }else{
+
+        for (var i = 0; i < objjsonsound["media"]["level"].length - 1; i++) {
+          // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
+
+          var mylinksdat = {
+            url: objjsonsound["media"]["level"][i]["source"],
+            size: "NaN MB",
+            quality: objjsonsound["media"]["level"][i]["value"],
+            mute: "false",
+            type: "mp4",
+          };
+
+          linkdsdata.push(mylinksdat);
+        }
+
+      }
+
+      res.status(200).json(object1);
+
+
     });
+
+
+  } else if (url.includes("linkedin")) {
+    //bitchute  https://www.izlesene.com/video/ehliyetsiz-surucuden-pes-dedirten-savunma-sadece-gece-biniyorum/10519222
+
+    // window._videoObj = {
+    
+    // }};
+
+
+    var request = require("request");
+
+    request({ uri: url }, function (error, response, body) {
+      var title = "{"+get_string_between(body, "window._videoObj = {", "}};")+"}}";
+
+       var objjsonsound = JSON.parse(title);
+       console.log(objjsonsound["media"]["level"].length);
+       console.log(objjsonsound["media"]["level"][0]["source"]);
+
+      
+  
+        var linkdsdata = [];
+
+        var object1 = {
+          title: objjsonsound["videoTitle"],
+          source: "izlesene",
+          thumbnail: objjsonsound["posterURL"],
+          duration: (objjsonsound["duration"]/ 1000)+"sec" ,
+          message: "true",
+          links: linkdsdata,
+        };
+
+
+        if(objjsonsound["media"]["level"].length == 1){
+
+          var mylinksdat = {
+            url: objjsonsound["media"]["level"][0]["source"],
+            size: "NaN MB",
+            quality: objjsonsound["media"]["level"][0]["value"],
+            mute: "false",
+            type: "mp4",
+          };
+
+          linkdsdata.push(mylinksdat);
+
+
+        }else{
+
+        for (var i = 0; i < objjsonsound["media"]["level"].length - 1; i++) {
+          // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
+
+          var mylinksdat = {
+            url: objjsonsound["media"]["level"][i]["source"],
+            size: "NaN MB",
+            quality: objjsonsound["media"]["level"][i]["value"],
+            mute: "false",
+            type: "mp4",
+          };
+
+          linkdsdata.push(mylinksdat);
+        }
+
+      }
+
+      res.status(200).json(object1);
+
+
+    });
+
+
   } 
   else if (url.includes("douyin")) {
     //douyin  https://www.iesdouyin.com/share/video/6878314461388639501
