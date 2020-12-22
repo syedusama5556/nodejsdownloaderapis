@@ -758,14 +758,12 @@ function getDataFromRemoteApi(urlis, res) {
     .then(function (response) {
       var objjsonsound = response.data;
 
-      console.lo;
-
       var linkdsdata = [];
 
       var title1 = "";
       const isset = require("isset");
 
-      if (isset(objjsonsound["response"])) {
+      if (!isset(objjsonsound["response"])) {
         console.log("Error");
         res.status(404).json({ message: "URL NOT FOUND", status: "404" });
       }
@@ -779,7 +777,7 @@ function getDataFromRemoteApi(urlis, res) {
         links: linkdsdata,
       };
 
-      //   console.log(objjsonsound["response"]["links"].length);
+       //  console.log(objjsonsound["response"]["links"]);
 
       if (objjsonsound["response"]["links"].length == 1) {
         var mylinksdat = {
