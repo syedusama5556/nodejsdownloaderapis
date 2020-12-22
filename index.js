@@ -384,52 +384,94 @@ app.post("/api", function (req, res) {
         res.status(200).json(object1);
       });
     });
-  }  else if (url.includes("izlesene")) {
-    //bitchute  https://www.izlesene.com/video/ehliyetsiz-surucuden-pes-dedirten-savunma-sadece-gece-biniyorum/10519222
-
-    // window._videoObj = {
-    
-    // }};
-
+  } else if (url.includes("fthis")) {
+    //fthis
+    //https://www.fthis.gr/videos/despoina-bandh-neo-ntoyeto-me-thn-korh-ths-melina-nikolaidh-video //TODO
 
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
-      var title = "{"+get_string_between(body, "window._videoObj = {", "}};")+"}}";
+      var title = get_string_between(response.body, "<title>", "</title>");
+      var titlesourcesrc = get_string_between(
+        response.body,
+        '<source src="',
+        'type="video/mp4">'
+      );
 
-       var objjsonsound = JSON.parse(title);
-       console.log(objjsonsound["media"]["level"].length);
-       console.log(objjsonsound["media"]["level"][0]["source"]);
+      console.log(title);
+      //  console.log(titlesourcesrc);
 
-      
-  
-        var linkdsdata = [];
+      // var videourl = dom.window.document.querySelector("source").src;
+      // console.log(videourl);
 
-        var object1 = {
-          title: objjsonsound["videoTitle"],
-          source: "izlesene",
-          thumbnail: objjsonsound["posterURL"],
-          duration: (objjsonsound["duration"]/ 1000)+"sec" ,
-          message: "true",
-          links: linkdsdata,
+      // var duration = dom.window.document.querySelector(
+      //   'span[class="video-duration"]'
+      // ).textContent;
+      // console.log(duration);
+
+      // var remote = require("remote-file-size");
+      // remote(videourl, function (err, o) {
+      //   var s = Math.round(o * 0.000001);
+
+      //   var object1 = {
+      //     title: title,
+      //     source: "fthis",
+      //     thumbnail: "https://pbs.twimg.com/profile_images/758986182436859908/qwxD4Qog.jpg",
+      //     duration: "NaN sec",
+      //     message: "true",
+      //     links: [
+      //       {
+      //         url: videourl,
+      //         size: s.toString() + " MB",
+      //         quality: "HD",
+      //         type: "mp4",
+      //         mute: "no",
+      //       },
+      //     ],
+      //   };
+
+      //   res.status(200).json(object1);
+      // });
+    });
+  } else if (url.includes("izlesene")) {
+    //bitchute  https://www.izlesene.com/video/ehliyetsiz-surucuden-pes-dedirten-savunma-sadece-gece-biniyorum/10519222
+
+    // window._videoObj = {
+
+    // }};
+
+    var request = require("request");
+
+    request({ uri: url }, function (error, response, body) {
+      var title =
+        "{" + get_string_between(body, "window._videoObj = {", "}};") + "}}";
+
+      var objjsonsound = JSON.parse(title);
+      console.log(objjsonsound["media"]["level"].length);
+      console.log(objjsonsound["media"]["level"][0]["source"]);
+
+      var linkdsdata = [];
+
+      var object1 = {
+        title: objjsonsound["videoTitle"],
+        source: "izlesene",
+        thumbnail: objjsonsound["posterURL"],
+        duration: objjsonsound["duration"] / 1000 + "sec",
+        message: "true",
+        links: linkdsdata,
+      };
+
+      if (objjsonsound["media"]["level"].length == 1) {
+        var mylinksdat = {
+          url: objjsonsound["media"]["level"][0]["source"],
+          size: "NaN MB",
+          quality: objjsonsound["media"]["level"][0]["value"],
+          mute: "false",
+          type: "mp4",
         };
 
-
-        if(objjsonsound["media"]["level"].length == 1){
-
-          var mylinksdat = {
-            url: objjsonsound["media"]["level"][0]["source"],
-            size: "NaN MB",
-            quality: objjsonsound["media"]["level"][0]["value"],
-            mute: "false",
-            type: "mp4",
-          };
-
-          linkdsdata.push(mylinksdat);
-
-
-        }else{
-
+        linkdsdata.push(mylinksdat);
+      } else {
         for (var i = 0; i < objjsonsound["media"]["level"].length - 1; i++) {
           // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
 
@@ -443,53 +485,45 @@ app.post("/api", function (req, res) {
 
           linkdsdata.push(mylinksdat);
         }
-
       }
 
       res.status(200).json(object1);
-
-
     });
-
-
   } else if (url.includes("linkedin")) {
     //linkdin  https://www.linkedin.com/posts/ajjames_wow-this-guy-has-skills-what-could-go-wrong-ugcPost-6746360912342462464-5Nf6
 
     // window._videoObj = {
-    
-    // }};
 
+    // }};
 
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
-      var mydatais = "[{"+get_string_between(body, "data-sources=\"[{", "}]\"")+"}]";
-    //  var poster = get_string_between(body, "data-poster-url=", "data");
+      var mydatais =
+        "[{" + get_string_between(body, 'data-sources="[{', '}]"') + "}]";
+      //  var poster = get_string_between(body, "data-poster-url=", "data");
 
-
-      const Entities = require('html-entities').AllHtmlEntities;
+      const Entities = require("html-entities").AllHtmlEntities;
 
       const entities = new Entities();
 
       var objjsonsound = JSON.parse(entities.decode(mydatais));
 
-
-
       var title = get_string_between(body, "<title>", "</title>");
 
-      console.log(objjsonsound[0]["src"])
+      console.log(response.headers);
+
       var linkdsdata = [];
 
       var object1 = {
         title: title,
         source: "linkdin",
-        thumbnail: "https://www.researchsnipers.com/wp-content/uploads/2018/06/linkedinlogo.png",
-        duration: "NaN sec" ,
+        thumbnail:
+          "https://www.researchsnipers.com/wp-content/uploads/2018/06/linkedinlogo.png",
+        duration: "NaN sec",
         message: "true",
         links: linkdsdata,
       };
-
-
 
       for (var i = 0; i < objjsonsound.length - 1; i++) {
         // console.log(objjsonsound['tracks'][i]["file"]["mp3-128"]);
@@ -497,7 +531,7 @@ app.post("/api", function (req, res) {
         var mylinksdat = {
           url: objjsonsound[i]["src"],
           size: "NaN MB",
-          quality:"HD",
+          quality: "HD",
           mute: "false",
           type: "mp4",
         };
@@ -505,16 +539,90 @@ app.post("/api", function (req, res) {
         linkdsdata.push(mylinksdat);
       }
 
- 
-
-   res.status(200).json(object1);
-
-
+      res.status(200).json(object1);
     });
+  } else if (
+    url.includes("kwai") ||
+    url.includes("kw.ai") ||
+    url.includes("abc") ||
+    url.includes("ok.ru") ||
+    url.includes("pinterest") ||
+    url.includes("gfycat") ||
+    url.includes("reddit") ||//todo not working withaudio
+    url.includes("redd.it") ||
+    url.includes("streamable") ||
+    url.includes("ted") ||
+    url.includes("twitter") ||
+    url.includes("tumblr") ||
+    url.includes("videoclip.bg") ||
+    url.includes("vk") ||
+    url.includes("vigovideo") ||
+    url.includes("wwe") ||
+    url.includes("vimeo")
+  ) {
+    //linkdin  http://kw.ai/p/1mIGdN98
+    //https://ok.ru/video/2872405723834
 
+    var encoded1 = "";
+    try {
+      encoded1 = encodeURI(url);
+    } catch (error) {
+      encoded1 = url;
+    }
+    //   var encoded1 = encodeURI(url);
+    // console.log(encoded1);
 
-  } 
-  else if (url.includes("douyin")) {
+    getDataFromRemoteApi(encoded1, res);
+  } else if (url.includes("mashable")) {
+    //linkdin  https://www.linkedin.com/posts/ajjames_wow-this-guy-has-skills-what-could-go-wrong-ugcPost-6746360912342462464-5Nf6
+
+    // window._videoObj = {
+
+    // }};
+
+    var request = require("request");
+
+    request({ uri: url }, function (error, response, body) {
+      var mydatais =
+        '{"@context":' +
+        get_string_between(
+          body,
+          '<script type="application/ld+json">{"@context":',
+          "}</script>"
+        ) +
+        "}";
+      //  var poster = get_string_between(body, "data-poster-url=", "data");
+
+      const jsdom = require("jsdom");
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(body);
+
+      var thumbnailp = dom.window.document.querySelectorAll(
+        'script[type="application/ld+json"]'
+      )[1].textContent;
+      var objjsonsound = JSON.parse(thumbnailp);
+      console.log(objjsonsound["description"]);
+
+      var title = objjsonsound["name"];
+
+      var object1 = {
+        title: title,
+        source: "mashable",
+        thumbnail: objjsonsound["thumbnailUrl"],
+        duration: objjsonsound["duration"],
+        message: "true",
+        links: {
+          url: objjsonsound["contentUrl"],
+          size: "NaN MB",
+          quality: "HD",
+          mute: "false",
+          type: "mp4",
+        },
+      };
+
+      res.status(200).json(object1);
+    });
+  } else if (url.includes("douyin")) {
     //douyin  https://www.iesdouyin.com/share/video/6878314461388639501
 
     var axios = require("axios");
@@ -626,4 +734,77 @@ function get_string_between_with_extra_colen(webpage, strstart, strend) {
   );
 
   return part;
+}
+
+function getDataFromRemoteApi(urlis, res) {
+  var axios = require("axios");
+
+  var config = {
+    method: "get",
+    url:
+      "http://keepsaveit.com/api?api_key=OlfZ0U6RbbV8wA7U4rquAAOQTCp5z7JPl7NNDmx39qgfaxIEqh&url=" +
+      urlis,
+  };
+
+  axios(config)
+    .then(function (response) {
+      var objjsonsound = response.data;
+
+
+console.lo
+
+      var linkdsdata = [];
+
+      var title1 =""
+      const isset = require('isset');
+ 
+     
+if(isset(objjsonsound["response"])){
+  console.log("Error");
+  res.status(404).json({ message: "URL NOT FOUND", status: "404" });
+}
+
+      var object1 = {
+        title: title1,
+        source: objjsonsound["domain"],
+        thumbnail: objjsonsound["response"]["thumbnail"],
+        duration: objjsonsound["duration"],
+        message: "true",
+        links: linkdsdata,
+      };
+
+   //   console.log(objjsonsound["response"]["links"].length);
+
+      if (objjsonsound["response"]["links"].length == 1) {
+        var mylinksdat = {
+          url: objjsonsound["response"]["links"][0]["url"],
+          size: objjsonsound["response"]["links"][0]["size"],
+          quality: objjsonsound["response"]["links"][0]["resolution"],
+          mute: "false",
+          type: "mp4",
+        };
+
+        linkdsdata.push(mylinksdat);
+      } else {
+        for (var i = 0; i < objjsonsound["response"]["links"].length - 1; i++) {
+        //  console.log(objjsonsound["response"]["links"][i]["url"]);
+
+          var mylinksdat = {
+            url: objjsonsound["response"]["links"][i]["url"],
+            size: objjsonsound["response"]["links"][i]["size"],
+            quality: objjsonsound["response"]["links"][i]["resolution"],
+            mute: "false",
+            type: "mp4",
+          };
+
+          linkdsdata.push(mylinksdat);
+          // if(i == )
+        }
+      }
+
+      res.status(200).json(object1);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }

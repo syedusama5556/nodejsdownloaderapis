@@ -18,6 +18,7 @@
     "html-entities": "^1.4.0",
     "http": "0.0.1-security",
     "http-build-query": "^0.7.0",
+    "isset": "^1.0.4",
     "jsdom": "^16.4.0",
     "remote-file-size": "^3.0.5",
     "request": "^2.88.2"
