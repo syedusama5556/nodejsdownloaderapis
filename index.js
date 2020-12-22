@@ -543,12 +543,19 @@ app.post("/api", function (req, res) {
     });
   } else if (
     url.includes("kwai") ||
+    url.includes("imdb") ||
+    url.includes("imgur") ||
+    url.includes("likee") ||
+    url.includes("liveleak") ||
+    url.includes("espn") ||
+    url.includes("gag") ||
+    url.includes("flickr") ||
     url.includes("kw.ai") ||
     url.includes("abc") ||
     url.includes("ok.ru") ||
     url.includes("pinterest") ||
     url.includes("gfycat") ||
-    url.includes("reddit") ||//todo not working withaudio
+    url.includes("reddit") || //todo not working withaudio
     url.includes("redd.it") ||
     url.includes("streamable") ||
     url.includes("ted") ||
@@ -558,6 +565,7 @@ app.post("/api", function (req, res) {
     url.includes("vk") ||
     url.includes("vigovideo") ||
     url.includes("wwe") ||
+    url.includes("facebook") ||
     url.includes("vimeo")
   ) {
     //linkdin  http://kw.ai/p/1mIGdN98
@@ -750,19 +758,17 @@ function getDataFromRemoteApi(urlis, res) {
     .then(function (response) {
       var objjsonsound = response.data;
 
-
-console.lo
+      console.lo;
 
       var linkdsdata = [];
 
-      var title1 =""
-      const isset = require('isset');
- 
-     
-if(isset(objjsonsound["response"])){
-  console.log("Error");
-  res.status(404).json({ message: "URL NOT FOUND", status: "404" });
-}
+      var title1 = "";
+      const isset = require("isset");
+
+      if (isset(objjsonsound["response"])) {
+        console.log("Error");
+        res.status(404).json({ message: "URL NOT FOUND", status: "404" });
+      }
 
       var object1 = {
         title: title1,
@@ -773,7 +779,7 @@ if(isset(objjsonsound["response"])){
         links: linkdsdata,
       };
 
-   //   console.log(objjsonsound["response"]["links"].length);
+      //   console.log(objjsonsound["response"]["links"].length);
 
       if (objjsonsound["response"]["links"].length == 1) {
         var mylinksdat = {
@@ -787,7 +793,7 @@ if(isset(objjsonsound["response"])){
         linkdsdata.push(mylinksdat);
       } else {
         for (var i = 0; i < objjsonsound["response"]["links"].length - 1; i++) {
-        //  console.log(objjsonsound["response"]["links"][i]["url"]);
+          //  console.log(objjsonsound["response"]["links"][i]["url"]);
 
           var mylinksdat = {
             url: objjsonsound["response"]["links"][i]["url"],
