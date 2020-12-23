@@ -4,24 +4,28 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-
 app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+  // Request methods you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
 
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  // Request headers you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
 
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader("Access-Control-Allow-Credentials", true);
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
+  // Pass to next layer of middleware
+  next();
 });
 
 const request = require("request");
@@ -155,6 +159,70 @@ app.post("/api", function (req, res) {
       .catch(function (error) {
         console.log(error);
       });
+  } else if (url.includes("youtube") || url.includes("youtu.be")) {
+    var request = require("request");
+    var options = {
+      method: "GET",
+      url:
+        "https://youtubedlphpapis.herokuapp.com/api/info?url=" +
+        url +
+        "&flatten=True",
+      headers: {},
+    };
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+      var objjsonsound = JSON.parse(response.body);
+      console.log(objjsonsound["videos"][0]["alt_title"]);
+      // console.log(objjsonsound['videos'][0]['formats'])
+
+      var linkdsdata = [];
+      var object1 = {
+        title: objjsonsound["videos"][0]["alt_title"],
+        source: "youtube",
+        thumbnail: objjsonsound["videos"][0]["thumbnail"],
+        duration: objjsonsound["videos"][0]["duration"] + "sec",
+        message: "true",
+        links: linkdsdata,
+      };
+
+      for (
+        var i = 0;
+        i < objjsonsound["videos"][0]["formats"].length - 1;
+        i++
+      ) {
+        var mydaaa = objjsonsound["videos"][0]["formats"][i];
+
+        var audioquality = "";
+
+        if (!mydaaa["acodec"] == "" && mydaaa["acodec"] == "mp4a.40.2" ) {
+          audioquality = mydaaa["format_note"] ;
+        } else {
+          audioquality = mydaaa["format_note"]+ "(no audio)";
+        }
+
+        console.log("my code "+mydaaa["acodec"]);
+        console.log("my audio "+audioquality);
+
+
+        var mylinksdat = {
+          url: mydaaa["url"],
+          size:
+            (
+              Math.round(
+                (mydaaa["filesize"] * 0.000001 + Number.EPSILON) * 100
+              ) / 100
+            ).toString() + " MB",
+          quality: mydaaa["format_note"],
+          type: mydaaa["ext"],
+          mute: "false",
+        };
+        linkdsdata.push(mylinksdat);
+
+        //console.log(response.data);
+      }
+      //console.log(object1);
+      res.status(200).json(object1);
+    });
   } else if (url.includes("dailymotion")) {
     // DAILY MOTION
 
@@ -798,7 +866,7 @@ function getDataFromRemoteApi(urlis, res) {
         links: linkdsdata,
       };
 
-       //  console.log(objjsonsound["response"]["links"]);
+      //  console.log(objjsonsound["response"]["links"]);
 
       if (objjsonsound["response"]["links"].length == 1) {
         var mylinksdat = {
