@@ -70,43 +70,92 @@ app.post("/api", function (req, res) {
   if (url.includes("tiktok")) {
     data.append("url", req.body.url);
 
+
+    data.append('id', req.body.url);
+    data.append('locale', 'en');
+    data.append('tt', '779a7d96ef51ac3943028e274d454e0c');
+    data.append('ts', '26744248');
+    data.append('User-Agent', 'ssstiktok.io/1.0@|addr:39.43.103.117/com.sss.video.downloader');
+    data.append('Authorization', 'd9a97b094b5a1cdbfaab98d117031de5f01e4faec165c5a6bdc452d1a52fc268');
+    
     var config = {
-      method: "post",
-      url: "https://savetik.app/go.php",
-      headers: {
-        ...data.getHeaders(),
+      method: 'post',
+      url: 'https://api2.ssstiktok.io/1/fetch',
+      headers: { 
+        'Cookie': 'PHPSESSID=13493505f48fa5a21340c31abd20064f', 
+        ...data.getHeaders()
       },
-      data: data,
+      data : data
     };
-
+    
     axios(config)
-      .then(function (response) {
-        //    var tiktokjsondata=  JSON.stringify(response)
-        //     console.log(response.data.vUrl)
+    .then(function (response) {
 
-        var object1 = {
-          title: "",
-          source: "tiktok",
-          thumbnail:
-            "https://p16-sign-sg.tiktokcdn.com/obj/tos-alisg-p-0037/f2af58ca6a3e4200a0b626e0c7dd09b5?x-expires=1607860800&x-signature=bS1a40wbmglEwPUUvAsl%2BZO382A%3D",
-          duration: "00:15",
-          message: "Success",
-          links: [
-            {
-              url: response.data.vUrl,
-              type: "mp4",
-              size: "2.3 MB",
-              quality: "720p",
-              mute: "no",
-            },
-          ],
-        };
+var top = "<!DOCTYPE html><html><body>"
 
-        res.status(200).json(object1);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+var bottom = "</body></html>"
+
+    //  console.log(top+response.data+bottom);
+var htmlbody = top+response.data+bottom
+
+
+      const jsdom = require("jsdom");
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(htmlbody);
+
+      var embededurl = dom.window.document.querySelector('a').href;
+
+      console.log("https://api2.ssstiktok.io/1/video"+embededurl);
+
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+
+
+
+
+
+    // var config = {
+    //   method: "post",
+    //   url: "https://savetik.app/go.php",
+    //   headers: {
+    //     ...data.getHeaders(),
+    //   },
+    //   data: data,
+    // };
+
+    // axios(config)
+    //   .then(function (response) {
+    //     //    var tiktokjsondata=  JSON.stringify(response)
+    //     //     console.log(response.data.vUrl)
+
+    //     var object1 = {
+    //       title: "",
+    //       source: "tiktok",
+    //       thumbnail:
+    //         "https://p16-sign-sg.tiktokcdn.com/obj/tos-alisg-p-0037/f2af58ca6a3e4200a0b626e0c7dd09b5?x-expires=1607860800&x-signature=bS1a40wbmglEwPUUvAsl%2BZO382A%3D",
+    //       duration: "00:15",
+    //       message: "Success",
+    //       links: [
+    //         {
+    //           url: response.data.vUrl,
+    //           type: "mp4",
+    //           size: "2.3 MB",
+    //           quality: "720p",
+    //           mute: "no",
+    //         },
+    //       ],
+    //     };
+
+    //     res.status(200).json(object1);
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+
+
   } else if (url.includes("mxtakatak")) {
     //  // TakaTak
     var axios = require("axios");
@@ -164,7 +213,7 @@ app.post("/api", function (req, res) {
     var options = {
       method: "GET",
       url:
-        "https://youtubedlphpapis.herokuapp.com/api/info?url=" +
+        "https://dlphpapis.herokuapp.com/api/info?url=" +
         url +
         "&flatten=True",
       headers: {},
@@ -223,71 +272,11 @@ app.post("/api", function (req, res) {
       //console.log(object1);
       res.status(200).json(object1);
     });
-  } else if (url.includes("dailymotion")) {
-    // DAILY MOTION
+  }
+  
+  
 
-    var axios = require("axios");
-    var FormData = require("form-data");
-    var data = new FormData();
-    data.append("url", "https://www.dailymotion.com/video/x7y1dxz");
-
-    var config = {
-      method: "post",
-      url: "https://dailymotion.aiovideodl.ml/system/action.php",
-      headers: {
-        "User-Agent": "Mozilla/4.73 [en] (X11; U; Linux 2.2.15 i686)",
-        Cookie:
-          "__cfduid=ddaadddf6ba7620bf1739308a21c77c641607757504; PHPSESSID=d865639e53531316013b386b4361ad77",
-        ...data.getHeaders(),
-      },
-      data: data,
-    };
-
-    axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data));
-
-        var linkdsdata = [];
-        var object1 = {
-          title: response.data["title"],
-          source: "dailymotion",
-          thumbnail: response.data["thumbnail"],
-          duration: "00:15",
-          message: "true",
-          links: linkdsdata,
-        };
-
-        for (var i = 0; i < response.data.links.length; i++) {
-          var cc = {
-            url: response.data.links[i]["url"],
-            type: "mp4",
-            title: response.data["title"],
-            source: "dailymotion",
-          };
-
-          var httpBuildQuery = require("http-build-query");
-
-          var vvv =
-            "https://dailymotion.aiovideodl.ml/dl.php?" + httpBuildQuery(cc);
-
-          var mylinksdat = {
-            url: vvv,
-            size: response.data.links[i]["size"],
-            quality: response.data.links[i]["quality"],
-            mute: response.data.links[i]["mute"],
-            type: "mp4",
-          };
-          linkdsdata.push(mylinksdat);
-
-          //console.log(response.data);
-        }
-        //console.log(object1);
-        res.status(200).json(object1);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } else if (url.includes("soundcloud")) {
+else if (url.includes("soundcloud")) {
     // soundcloud
     // <title>Bewafa Tera Masoom Chehra - Jubin Nautiyal by AITCH</title>
     //https://soundcloud.com/raja-saadain-nazir-873025150/raaz-e-ulfat-ost-shahzad
@@ -653,6 +642,7 @@ app.post("/api", function (req, res) {
     url.includes("videoclip.bg") ||
     url.includes("vk") ||
     url.includes("vigovideo") ||
+  url.includes("dailymotion") ||
     url.includes("wwe") ||
     url.includes("facebook") ||
     url.includes("vimeo")
