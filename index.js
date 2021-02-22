@@ -156,6 +156,75 @@ var htmlbody = top+response.data+bottom
     //   });
 
 
+  } else if (url.includes("veoh")) {
+
+
+
+    url = url.substring(url.lastIndexOf("/") + 1);
+
+
+  console.log("dgasjhdjhasdjah = "+url)
+
+    var axios = require('axios');
+
+var config = {
+  method: 'get',
+  url: 'http://www.veoh.com/watch/getVideo/'+url,
+  headers: { 
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 10;TXY567) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/8399.0.9993.96 Mobile Safari/599.36', 
+    'Cookie': 'lang=en; laravel_session=eyJpdiI6InhoOUxsWnhIWmd3U3dzMmlcLzAxRDlRPT0iLCJ2YWx1ZSI6InRkOVpPaXFwc1Bvdkh3bUd2eEo1YmRvbjY2MGFmTXcrSytMV2N5cHZIanhDWE9pazFwWjdDeGhPa0tqYyt2cWt5UFdQbFg1aDRiUFRrTkV5b3AxXC9CUT09IiwibWFjIjoiNTU2MGM5MWMxYmNjNjFkZDQ1OTY3NWE3MmIyMTNmYTViYzVjNDI4NDdmYWUxOWI3ZmRiZTRmM2IxYTNiNWRiMCJ9'
+  }
+};
+
+axios(config)
+.then(function (response) {
+ 
+
+var jsondata = response.data;
+
+  var status = response.data.status;
+
+
+
+
+
+
+  var object1 = {
+    title: jsondata["video"]["title"],
+    source: "veoh",
+    thumbnail: jsondata["video"]["src"]["poster"],
+    duration: jsondata["video"]["length"],
+    message: status,
+    links: [
+      {
+        url:  jsondata["video"]["src"]["HQ"],
+        size: jsondata["video"]["size"],
+        quality: "HQ",
+        mute: "no",
+      },     {
+        url: jsondata["video"]["src"]["Regular"],
+        size: jsondata["video"]["size"],
+        quality: "Regular",
+        mute: "no",
+      }
+    ],
+  };
+  
+  res.status(200).json(object1);
+
+
+
+
+})
+.catch(function (error) {
+  console.log(error);
+});
+
+
+
+
+
+
   } else if (url.includes("mxtakatak")) {
     //  // TakaTak
     var axios = require("axios");
@@ -358,6 +427,8 @@ else if (url.includes("soundcloud")) {
     var request = require("request");
 
     request({ uri: url }, function (error, response, body) {
+
+
       var title = get_string_between(body, "<title>", "</title>");
 
       const jsdom = require("jsdom");
